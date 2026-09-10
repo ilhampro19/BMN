@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
-  Plus, Pencil, Trash2, Building2, Car, Laptop, Armchair, Package, X,
+  Plus, Pencil, Trash2, Building2, Car, Laptop, Armchair, Package, X, ShieldAlert, Tag,
 } from 'lucide-react'
+import { API_BASE_URL } from '../lib/api'
+import { useAuth } from '../context/AuthContext'
 
-const API_URL = 'http://localhost:5000/api/kategori-item'
+const API_URL = `${API_BASE_URL}/kategori-item`
 
 // Pick an icon based on keywords in the category name - purely visual, no data meaning
 function getIconForKategori(name) {
@@ -28,6 +30,9 @@ const emptyForm = {
 }
 
 function Kategori() {
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'admin'
+
   const [kategoriList, setKategoriList] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -63,7 +68,7 @@ function Kategori() {
   }
 
   function openEditModal(kategori) {
-    setEditingId(kategori._id)
+    setEditingId(kategori.id || kategori._id)
     setForm({
       kategoriItemCode: kategori.kategoriItemCode,
       kategoriItemName: kategori.kategoriItemName,
@@ -129,9 +134,15 @@ function Kategori() {
             Kelola klasifikasi aset Barang Milik Negara (BMN) dan parameter penyusutan
           </p>
         </div>
-        <Button onClick={openCreateModal} className="bg-navy hover:bg-navy-light">
-          <Plus size={15} className="mr-1" /> Tambah Kategori
-        </Button>
+        {isAdmin ? (
+          <Button onClick={openCreateModal} className="bg-navy hover:bg-navy-light">
+            <Plus size={15} className="mr-1" /> Tambah Kategori
+          </Button>
+        ) : (
+          <div className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-ink/50 border border-black/5 font-medium flex items-center gap-1.5">
+            <ShieldAlert size={14} /> Dikelola oleh Admin BMN
+          </div>
+        )}
       </div>
 
       {/* STAT CARDS */}
@@ -169,14 +180,14 @@ function Kategori() {
                 <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Umur Ekonomis</th>
                 <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Tarif</th>
                 <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Metode</th>
-                <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3 w-24">Aksi</th>
+                {isAdmin && <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3 w-24">Aksi</th>}
               </tr>
             </thead>
             <tbody>
               {kategoriList.map((kategori) => {
                 const Icon = getIconForKategori(kategori.kategoriItemName)
                 return (
-                  <tr key={kategori._id} className="border-b border-black/5 last:border-0">
+                  <tr key={kategori._id || kategori.id} className="border-b border-black/5 last:border-0">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
@@ -193,24 +204,26 @@ function Kategori() {
                         Garis Lurus
                       </span>
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => openEditModal(kategori)}
-                          className="p-1.5 rounded hover:bg-gray-100 text-ink/50 hover:text-ink transition-colors"
-                          aria-label="Edit"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(kategori._id, kategori.kategoriItemName)}
-                          className="p-1.5 rounded hover:bg-rust-bg text-ink/50 hover:text-rust transition-colors"
-                          aria-label="Hapus"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
+                    {isAdmin && (
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => openEditModal(kategori)}
+                            className="p-1.5 rounded hover:bg-gray-100 text-ink/50 hover:text-ink transition-colors"
+                            aria-label="Edit"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(kategori._id || kategori.id, kategori.kategoriItemName)}
+                            className="p-1.5 rounded hover:bg-rust-bg text-ink/50 hover:text-rust transition-colors"
+                            aria-label="Hapus"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 )
               })}
@@ -219,80 +232,121 @@ function Kategori() {
         </div>
       )}
 
-      {/* MODAL FORM - shown for both Create and Edit */}
+      {/* MODAL FORM - shown for both Create and Edit (GOOGLE ADVANCED SEARCH STYLE) */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-lg">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-ink">
-                {editingId ? 'Edit Kategori' : 'Tambah Kategori Baru'}
-              </h2>
-              <button onClick={closeModal} className="text-ink/40 hover:text-ink">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 overflow-hidden">
+            {/* MODAL HEADER */}
+            <div className="px-6 py-4 border-b border-slate-200 bg-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-navy/10 text-navy flex items-center justify-center font-bold">
+                  <Tag size={18} />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-800">
+                    {editingId ? 'Edit Kategori BMN' : 'Tambah Kategori BMN Baru'}
+                  </h2>
+                  <p className="text-[11px] text-slate-500">Master tabel kategori untuk masa manfaat & persentase penyusutan aset</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors"
+              >
                 <X size={18} />
               </button>
             </div>
 
+            {/* MODAL BODY (HORIZONTAL FORM) */}
             <form onSubmit={handleSubmit}>
-              {formError && (
-                <p className="text-sm text-rust bg-rust-bg p-2 rounded mb-4">{formError}</p>
-              )}
+              <div className="p-6 space-y-4 text-xs">
+                {formError && (
+                  <p className="text-xs text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200">{formError}</p>
+                )}
 
-              <div className="mb-4">
-                <Label htmlFor="kategoriItemCode">Kode Kategori</Label>
-                <Input
-                  id="kategoriItemCode"
-                  value={form.kategoriItemCode}
-                  onChange={(e) => setForm({ ...form, kategoriItemCode: e.target.value })}
-                  placeholder="Contoh: KMP-001"
-                  required
-                  className="mt-1"
-                />
-              </div>
-
-              <div className="mb-4">
-                <Label htmlFor="kategoriItemName">Nama Kategori</Label>
-                <Input
-                  id="kategoriItemName"
-                  value={form.kategoriItemName}
-                  onChange={(e) => setForm({ ...form, kategoriItemName: e.target.value })}
-                  placeholder="Contoh: Komputer / Laptop"
-                  required
-                  className="mt-1"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div>
-                  <Label htmlFor="umurEkonomisTahun">Umur Ekonomis (tahun)</Label>
-                  <Input
-                    id="umurEkonomisTahun"
-                    type="number"
-                    value={form.umurEkonomisTahun}
-                    onChange={(e) => setForm({ ...form, umurEkonomisTahun: e.target.value })}
-                    required
-                    className="mt-1"
-                  />
+                {/* Kode Kategori */}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-3 items-center">
+                  <label htmlFor="kategoriItemCode" className="sm:col-span-5 text-xs font-medium text-slate-700 sm:text-right">
+                    Kode Kategori <span className="text-red-500 font-bold">*</span>:
+                  </label>
+                  <div className="sm:col-span-7">
+                    <Input
+                      id="kategoriItemCode"
+                      value={form.kategoriItemCode}
+                      onChange={(e) => setForm({ ...form, kategoriItemCode: e.target.value })}
+                      placeholder="Contoh: KMP-001"
+                      required
+                      className="bg-white font-mono text-xs h-9 border-slate-300 focus:border-navy"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="tarifPenyusutanPersen">Tarif (%/tahun)</Label>
-                  <Input
-                    id="tarifPenyusutanPersen"
-                    type="number"
-                    step="0.1"
-                    value={form.tarifPenyusutanPersen}
-                    onChange={(e) => setForm({ ...form, tarifPenyusutanPersen: e.target.value })}
-                    required
-                    className="mt-1"
-                  />
+
+                {/* Nama Kategori */}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-3 items-center">
+                  <label htmlFor="kategoriItemName" className="sm:col-span-5 text-xs font-medium text-slate-700 sm:text-right">
+                    Nama Kategori <span className="text-red-500 font-bold">*</span>:
+                  </label>
+                  <div className="sm:col-span-7">
+                    <Input
+                      id="kategoriItemName"
+                      value={form.kategoriItemName}
+                      onChange={(e) => setForm({ ...form, kategoriItemName: e.target.value })}
+                      placeholder="Contoh: Komputer / Laptop"
+                      required
+                      className="bg-white text-xs h-9 border-slate-300 focus:border-navy"
+                    />
+                  </div>
+                </div>
+
+                {/* Umur Ekonomis */}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-3 items-center">
+                  <label htmlFor="umurEkonomisTahun" className="sm:col-span-5 text-xs font-medium text-slate-700 sm:text-right">
+                    Masa Manfaat (Tahun) <span className="text-red-500 font-bold">*</span>:
+                  </label>
+                  <div className="sm:col-span-7">
+                    <Input
+                      id="umurEkonomisTahun"
+                      type="number"
+                      min="1"
+                      value={form.umurEkonomisTahun}
+                      onChange={(e) => setForm({ ...form, umurEkonomisTahun: e.target.value })}
+                      placeholder="Contoh: 4"
+                      required
+                      className="bg-white text-xs h-9 border-slate-300 focus:border-navy"
+                    />
+                  </div>
+                </div>
+
+                {/* Tarif Penyusutan */}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-3 items-center">
+                  <label htmlFor="tarifPenyusutanPersen" className="sm:col-span-5 text-xs font-medium text-slate-700 sm:text-right">
+                    Tarif Penyusutan (%/Tahun) <span className="text-red-500 font-bold">*</span>:
+                  </label>
+                  <div className="sm:col-span-7">
+                    <Input
+                      id="tarifPenyusutanPersen"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="100"
+                      value={form.tarifPenyusutanPersen}
+                      onChange={(e) => setForm({ ...form, tarifPenyusutanPersen: e.target.value })}
+                      placeholder="Contoh: 25"
+                      required
+                      className="bg-white text-xs h-9 border-slate-300 focus:border-navy"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <Button type="button" variant="outline" onClick={closeModal} className="flex-1">
+              {/* MODAL FOOTER */}
+              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                <Button type="button" variant="outline" size="sm" onClick={closeModal} className="text-xs h-9 px-4 border-slate-300 text-slate-600 hover:bg-slate-100 rounded-lg">
                   Batal
                 </Button>
-                <Button type="submit" disabled={submitting} className="flex-1 bg-navy hover:bg-navy-light">
-                  {submitting ? 'Menyimpan...' : 'Simpan'}
+                <Button type="submit" disabled={submitting} size="sm" className="bg-navy hover:bg-navy-light text-white text-xs h-9 px-5 rounded-lg shadow-sm">
+                  {submitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Kategori')}
                 </Button>
               </div>
             </form>

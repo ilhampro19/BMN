@@ -1,5 +1,6 @@
 import { createContext, useState, useContext } from 'react'
 import axios from 'axios'
+import { API_BASE_URL } from '../lib/api'
 
 // Context ini "papan pengumuman" tempat data auth disimpan,
 // bisa diakses komponen mana aja tanpa perlu dioper lewat props
@@ -16,7 +17,7 @@ export function AuthProvider({ children }) {
   })
 
   async function login(email, password) {
-    const response = await axios.post('http://localhost:5000/api/users/login', {
+    const response = await axios.post(`${API_BASE_URL}/users/login`, {
       email,
       password,
     })

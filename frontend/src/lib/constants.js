@@ -1,0 +1,30 @@
+export const UNIT_KERJA_OPTIONS = [
+  'Semua Unit Kerja',
+  'Sekretariat Itjen',
+  'Inspektorat Wilayah I',
+  'Inspektorat Wilayah II',
+  'Inspektorat Wilayah III',
+  'Inspektorat Wilayah IV',
+  'Inspektorat Khusus',
+]
+
+export const RUANGAN_GEDUNG_ITJEN = [
+  'Lantai 1 - Lobby & Layanan Tamu APIP',
+  'Lantai 1 - Ruang Server & Data Center Pengawasan',
+  'Lantai 1 - Gudang Perlengkapan BMN',
+  'Lantai 1 - Pool Kendaraan Operasional Dinas',
+  'Lantai 2 - Ruang Rapat Utama Ses Itjen',
+  'Lantai 2 - Ruang Kerja Bagian Umum & Kepegawaian',
+  'Lantai 2 - Ruang Subbag Pengelolaan BMN & Rumah Tangga',
+  'Lantai 2 - Ruang Kerja Bagian Perencanaan & Keuangan',
+  'Lantai 3 - Ruang Kerja & Ruang Rapat Irwil I',
+  'Lantai 3 - Ruang Auditor Fungsional Irwil I',
+  'Lantai 3 - Ruang Kerja & Ruang Rapat Irwil II',
+  'Lantai 3 - Ruang Auditor Fungsional Irwil II',
+  'Lantai 3 - Ruang Kerja Inspektorat Khusus (Imsus)',
+  'Lantai 4 - Ruang Kerja & Ruang Rapat Irwil III',
+  'Lantai 4 - Ruang Auditor Fungsional Irwil III',
+  'Lantai 4 - Ruang Kerja & Ruang Rapat Irwil IV',
+  'Lantai 4 - Ruang Auditor Fungsional Irwil IV',
+  'Lantai 4 - Ruang Kerja Inspektur Jenderal (Irjen)',
+]

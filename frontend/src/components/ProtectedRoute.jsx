@@ -1,15 +1,19 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth()
+function ProtectedRoute({ children, allowedRoles }) {
+  const { isAuthenticated, user } = useAuth()
 
   if (!isAuthenticated) {
-    // Not logged in - redirect straight to the login page
+    // Belum login - arahkan ke login page
     return <Navigate to="/login" replace />
   }
 
-  // Logged in - render the requested page
+  // Jika halaman dibatasi untuk role tertentu
+  if (allowedRoles && !allowedRoles.includes(user?.role || 'admin')) {
+    return <Navigate to="/dashboard" replace />
+  }
+
   return children
 }
 

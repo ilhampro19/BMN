@@ -1,0 +1,5 @@
+auditor hapus
+contoh bst pengembelian dan penyerahan barang minta bang Ardhi
+
+1 role umum/staf semua role bisa akses, surat minta perbaaikan bmn
+dr umum/STAF ke operator HABIS ITU minta pimpinan ACC
