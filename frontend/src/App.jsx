@@ -10,6 +10,7 @@ import KIR from './pages/KIR'
 import PeminjamanWasrik from './pages/PeminjamanWasrik'
 import Approval from './pages/Approval'
 import PengajuanServis from './pages/PengajuanServis'
+import Users from './pages/Users'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
       
       {/* Khusus Admin BMN */}
       <Route path="/kategori" element={<ProtectedRoute allowedRoles={['admin']}><Kategori /></ProtectedRoute>} />
+      <Route path="/users" element={<ProtectedRoute allowedRoles={['admin']}><Users /></ProtectedRoute>} />
       
       {/* Admin & Pimpinan (Nilai Buku / Laporan) */}
       <Route path="/penyusutan" element={<ProtectedRoute allowedRoles={['admin', 'pimpinan']}><Penyusutan /></ProtectedRoute>} />

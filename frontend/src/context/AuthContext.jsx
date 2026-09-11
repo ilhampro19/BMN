@@ -41,11 +41,18 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
+  function updateUserProfile(updatedUserData) {
+    const merged = { ...user, ...updatedUserData }
+    localStorage.setItem('user', JSON.stringify(merged))
+    setUser(merged)
+  }
+
   const value = {
     token,
     user,
     login,
     logout,
+    updateUserProfile,
     isAuthenticated: !!token, // true kalau ada token, false kalau null
   }
 

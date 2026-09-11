@@ -8,6 +8,7 @@ use App\Http\Controllers\PeminjamanWasrikController;
 use App\Http\Controllers\PengajuanServisController;
 use App\Http\Controllers\PenyusutanController;
 use App\Http\Controllers\RenovasiController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
@@ -63,3 +64,14 @@ Route::post('/pengajuan-servis/{id}/approve', [PengajuanServisController::class,
 Route::post('/pengajuan-servis/{id}/reject', [PengajuanServisController::class, 'rejectPimpinan']);
 Route::post('/pengajuan-servis/{id}/selesai', [PengajuanServisController::class, 'selesai']);
 Route::delete('/pengajuan-servis/{id}', [PengajuanServisController::class, 'destroy']);
+
+// Manajemen Pengguna (Users) Routes (Admin)
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/users', [UserController::class, 'store']);
+Route::get('/users/{id}', [UserController::class, 'show']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword']);
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+// Pengaturan Profil Mandiri (Self-Service Profile)
+Route::post('/profile/update', [UserController::class, 'updateProfile']);

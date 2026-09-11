@@ -1,24 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import logoKemendagri from '../assets/logo-kemendagri.jpeg'
-import {
-  ShieldCheck,
-  UserCheck,
-  Briefcase,
-  Lock,
-  Mail,
-  ArrowRight,
-  Building2,
-  CheckCircle2,
-  Sparkles,
-  Award,
-  Eye,
-  EyeOff
-} from 'lucide-react'
+import { Eye, EyeOff, KeyRound, X, Copy } from 'lucide-react'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -26,6 +10,8 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showForgotModal, setShowForgotModal] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -34,246 +20,219 @@ function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     try {
       await login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Akses ditolak. Periksa kembali email kedinasan dan kata sandi Anda.')
+      setError(err.response?.data?.message || 'Email atau kata sandi salah.')
     } finally {
       setLoading(false)
     }
   }
 
-  function handleQuickRole(roleEmail) {
-    setEmail(roleEmail)
-    setPassword('password123')
-  }
-
   return (
-    <div className="min-h-screen w-full bg-[#0b1329] relative flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden font-sans selection:bg-amber-500 selection:text-white">
-      {/* LUXURY BACKGROUND ORNAMENTS & GLOW */}
-      <div className="absolute top-[-15%] left-[-10%] w-[650px] h-[650px] bg-gradient-to-br from-amber-500/15 via-indigo-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-gradient-to-tl from-blue-600/15 via-amber-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-6 lg:p-8 2xl:p-12 font-sans" style={{ background: '#eceae5' }}>
+      {/* MAIN CARD (Fluid & Responsive: Mobile, Tablet, Laptop, Desktop, TV) */}
+      <div
+        className="w-full max-w-md sm:max-w-lg lg:max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-2 my-auto"
+        style={{ background: '#f7f5f2' }}
+      >
 
-      {/* MAIN CONTAINER (PRESTIGIOUS DUAL PANEL) */}
-      <div className="relative z-10 w-full max-w-5xl bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.55)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-
-        {/* LEFT PANEL: HERO BRANDING (PRESTIGE & AUTHORITY) */}
-        <div className="lg:col-span-5 p-8 sm:p-10 bg-gradient-to-b from-[#111a38]/90 via-[#0e1730]/95 to-[#090f20] border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col justify-between relative overflow-hidden">
-          {/* Subtle gold line accent */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-75" />
-
-          <div>
-            {/* LOGO & OFFICIAL HEADER */}
-            <div className="flex items-center gap-3.5 mb-8">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400/20 to-white/5 p-[1px] shadow-lg shadow-amber-500/10">
-                <div className="w-full h-full bg-[#16213e] rounded-2xl flex items-center justify-center p-2">
-                  <img src={logoKemendagri} alt="Logo Kemendagri" className="w-10 h-10 object-contain drop-shadow" />
-                </div>
-              </div>
-              <div>
-                <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-amber-400 font-semibold block">
-                  Republik Indonesia
-                </span>
-                <h2 className="text-base font-bold text-white tracking-wide uppercase leading-tight">
-                  Kementerian Dalam Negeri
-                </h2>
-                <p className="text-xs text-white/50 font-medium">Inspektorat Jenderal</p>
-              </div>
-            </div>
-
-            {/* TITLE & DESCRIPTION */}
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium">
-                <Sparkles size={13} className="text-amber-400" /> Portal Terintegrasi Aset Negara
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-                Sistem Manajemen <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100">
-                  Aset & BMN Itjen
-                </span>
-              </h1>
-              <p className="text-xs text-white/60 leading-relaxed pt-1">
-                Platform resmi tata kelola Barang Milik Negara (BMN), pengawasan wasrik, alur nota dinas servis berjenjang, dan mutasi ruangan gedung Itjen.
-              </p>
-            </div>
-
-            {/* KEY METRICS / TRUST BADGES */}
-            <div className="grid grid-cols-2 gap-2.5 pt-6 mt-6 border-t border-white/10">
-              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
-                <p className="text-lg font-bold text-amber-300">100%</p>
-                <p className="text-[10px] text-white/50 leading-tight mt-0.5">Tervalidasi SAKTI & SIMAN</p>
-              </div>
-              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
-                <p className="text-lg font-bold text-white flex items-center gap-1">
-                  Tier-3 <Award size={14} className="text-amber-400" />
-                </p>
-                <p className="text-[10px] text-white/50 leading-tight mt-0.5">Alur Otorisasi Multi-Role</p>
-              </div>
-            </div>
+        {/* ── LEFT: FORM PANEL ── */}
+        <div className="flex flex-col justify-center px-6 sm:px-10 py-8 sm:py-12 lg:py-14 2xl:px-14 2xl:py-16" style={{ background: '#f7f5f2' }}>
+          {/* Logo + Title */}
+          <div className="flex flex-col items-center mb-7 text-center">
+            <img src={logoKemendagri} alt="Logo Kemendagri" className="w-14 h-14 object-contain mb-3" />
+            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Masuk ke Sistem BMN</h1>
+            <p className="text-[11px] text-gray-400 mt-1 tracking-wide">INSPEKTORAT JENDERAL KEMENDAGRI</p>
           </div>
 
-          {/* FOOTER LEFT */}
-          <div className="pt-8 text-[11px] text-white/40 flex items-center justify-between">
-            <span>Sekretariat Inspektorat Jenderal</span>
-            <span className="font-mono text-white/30">v1.0 • 2026</span>
+          {/* Separator */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-[10px] text-gray-400 tracking-widest uppercase">Gunakan akun kedinasan</span>
+            <div className="flex-1 h-px bg-gray-200" />
           </div>
+
+          {/* Error */}
+          {error && (
+            <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full h-11 px-4 text-sm rounded-xl border-0 text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800 transition"
+              style={{ background: '#eceae5' }}
+            />
+
+            {/* Password */}
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full h-11 px-4 pr-11 text-sm rounded-xl border-0 text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800 transition"
+                style={{ background: '#eceae5' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(true)}
+                className="text-xs text-gray-500 hover:text-gray-800 transition-colors font-medium cursor-pointer"
+              >
+                Lupa kata sandi?
+              </button>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 text-white font-bold text-sm rounded-full transition-all shadow-md hover:opacity-90 cursor-pointer disabled:opacity-60 mt-1"
+              style={{ background: '#1a2744' }}
+            >
+              {loading ? 'MEMVERIFIKASI...' : 'MASUK'}
+            </button>
+          </form>
+
+          <p className="mt-8 text-center text-[10px] text-gray-300">
+            &copy; {new Date().getFullYear()} Inspektorat Jenderal Kementerian Dalam Negeri
+          </p>
         </div>
 
-        {/* RIGHT PANEL: LUXURY LOGIN FORM */}
-        <div className="lg:col-span-7 p-8 sm:p-10 lg:p-12 bg-white/[0.02] backdrop-blur-xl flex flex-col justify-center">
-          <div className="max-w-md w-full mx-auto space-y-6">
-
-            {/* FORM TITLE */}
-            <div>
-              <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                Otentikasi Kedinasan <Lock size={18} className="text-amber-400" />
-              </h3>
-              <p className="text-xs text-white/50 mt-1">
-                Silakan masukkan kredensial akun kedinasan Anda untuk mengakses data BMN.
-              </p>
-            </div>
-
-            {/* ERROR ALERT */}
-            {error && (
-              <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-200 flex items-start gap-2.5 animate-in fade-in duration-200">
-                <div className="w-4 h-4 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 mt-0.5">✕</div>
-                <p className="flex-1 leading-snug">{error}</p>
+        {/* ── FORGOT PASSWORD MODAL ── */}
+        {showForgotModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="bg-white rounded-3xl max-w-md w-full p-7 shadow-2xl space-y-5 border border-gray-100">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-600">
+                    <KeyRound size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900">Lupa Kata Sandi?</h3>
+                    <p className="text-xs text-gray-500">Bantuan Akses Akun Kedinasan</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotModal(false)}
+                  className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
               </div>
-            )}
 
-            {/* LOGIN FORM */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* EMAIL FIELD */}
-              <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-medium text-white/80 flex items-center gap-1.5">
-                  <Mail size={13} className="text-amber-400/80" /> Email Resmi Kedinasan
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="nama.pegawai@kemendagri.go.id"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-white/[0.05] border-white/10 text-white placeholder:text-white/25 focus:border-amber-400/70 focus:ring-1 focus:ring-amber-400/50 rounded-xl h-11 text-xs px-3.5 transition-all"
-                  />
+              <div className="bg-gray-50 rounded-2xl p-4 text-xs text-gray-600 space-y-2.5 border border-gray-100 leading-relaxed">
+                <p>
+                  Untuk menjaga keamanan aset dan data Barang Milik Negara (BMN), pengaturan ulang kata sandi akun kedinasan dilakukan secara terpusat oleh <strong className="text-gray-900">Administrator BMN</strong>.
+                </p>
+                <div className="pt-2 border-t border-gray-200/60 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400">Unit Pengelola:</span>
+                    <span className="font-semibold text-gray-800">Subbag BMN &amp; Rumah Tangga</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400">Email Admin:</span>
+                    <span className="font-mono font-semibold text-gray-800 text-[11px]">admin.bmn@kemendagri.go.id</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400">Lokasi:</span>
+                    <span className="font-semibold text-gray-800">Gedung Itjen Kemendagri</span>
+                  </div>
                 </div>
               </div>
 
-              {/* PASSWORD FIELD */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-xs font-medium text-white/80 flex items-center gap-1.5">
-                    <Lock size={13} className="text-amber-400/80" /> Kata Sandi Keamanan
-                  </Label>
-                  <span className="text-[10px] text-amber-400/70 hover:text-amber-300 cursor-pointer">
-                    Bantuan Akun?
-                  </span>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Masukkan kata sandi..."
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-white/[0.05] border-white/10 text-white placeholder:text-white/25 focus:border-amber-400/70 focus:ring-1 focus:ring-amber-400/50 rounded-xl h-11 text-xs px-3.5 pr-10 transition-all font-mono"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
-                  >
-                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
+              <div className="text-[11px] text-gray-500 bg-blue-50/60 border border-blue-100 p-3 rounded-xl flex items-start gap-2">
+                <span className="text-blue-600 font-bold shrink-0 mt-0.5">ℹ</span>
+                <p>Silakan hubungi Administrator atau Operator TU di unit kerja Anda untuk melakukan reset kata sandi ke sandi default.</p>
               </div>
 
-              {/* SUBMIT BUTTON */}
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white font-bold h-11 rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/35 transition-all flex items-center justify-center gap-2 text-xs tracking-wide uppercase mt-2 cursor-pointer"
-              >
-                {loading ? (
-                  <span>Memverifikasi Otorisasi...</span>
-                ) : (
-                  <>
-                    <span>Masuk ke Dashboard BMN</span>
-                    <ArrowRight size={15} />
-                  </>
-                )}
-              </Button>
-            </form>
-
-            {/* QUICK ROLE SELECTOR FOR EASY TESTING / ACCESSIBILITY */}
-            <div className="pt-5 border-t border-white/10">
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[11px] font-semibold text-white/60 tracking-wider uppercase flex items-center gap-1">
-                  <CheckCircle2 size={12} className="text-amber-400" /> Akses Cepat Simulasi Role
-                </span>
-                <span className="text-[10px] text-amber-400/80 font-mono">Password: password123</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {/* ADMIN */}
+              <div className="flex gap-2.5 pt-1">
                 <button
                   type="button"
-                  onClick={() => handleQuickRole('admin.bmn@kemendagri.go.id')}
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-amber-500/10 border border-white/5 hover:border-amber-500/40 text-left transition-all group cursor-pointer"
+                  onClick={() => {
+                    navigator.clipboard.writeText('admin.bmn@kemendagri.go.id')
+                    setCopied(true)
+                    setTimeout(() => setCopied(false), 2000)
+                  }}
+                  className="flex-1 h-10 border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-300 group-hover:text-amber-200">
-                    <ShieldCheck size={13} className="text-amber-400" />
-                    <span>Admin BMN</span>
-                  </div>
-                  <p className="text-[10px] text-white/40 truncate mt-0.5">Subbag BMN & Rumah Tangga</p>
+                  <Copy size={14} />
+                  {copied ? 'Tersalin!' : 'Salin Email Admin'}
                 </button>
-
-                {/* OPERATOR TU */}
                 <button
                   type="button"
-                  onClick={() => handleQuickRole('operator.irwil1@kemendagri.go.id')}
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-emerald-500/10 border border-white/5 hover:border-emerald-500/40 text-left transition-all group cursor-pointer"
+                  onClick={() => setShowForgotModal(false)}
+                  className="flex-1 h-10 text-white text-xs font-semibold rounded-xl transition-all shadow-sm cursor-pointer"
+                  style={{ background: '#1a2744' }}
                 >
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 group-hover:text-emerald-300">
-                    <UserCheck size={13} className="text-emerald-400" />
-                    <span>Operator TU</span>
-                  </div>
-                  <p className="text-[10px] text-white/40 truncate mt-0.5">Verifikator Tahap 1 (TU)</p>
-                </button>
-
-                {/* STAF UMUM */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickRole('staf.budi@kemendagri.go.id')}
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-blue-500/10 border border-white/5 hover:border-blue-500/40 text-left transition-all group cursor-pointer"
-                >
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-blue-400 group-hover:text-blue-300">
-                    <UserCheck size={13} className="text-blue-400" />
-                    <span>Staf Pemohon</span>
-                  </div>
-                  <p className="text-[10px] text-white/40 truncate mt-0.5">Pengusul Servis / Nota Dinas</p>
-                </button>
-
-                {/* PIMPINAN / IRJEN */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickRole('irjen@kemendagri.go.id')}
-                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-amber-500/10 border border-white/5 hover:border-amber-500/40 text-left transition-all group cursor-pointer"
-                >
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-400 group-hover:text-amber-300">
-                    <Briefcase size={13} className="text-amber-400" />
-                    <span>Pimpinan Itjen</span>
-                  </div>
-                  <p className="text-[10px] text-white/40 truncate mt-0.5">Inspektur Jenderal (Approval)</p>
+                  Mengerti
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── RIGHT: DECORATIVE PANEL ── */}
+        <div
+          className="relative hidden lg:flex flex-col items-center justify-center overflow-hidden px-12 py-14"
+          style={{ background: '#eceae5' }}
+        >
+          {/* Circle ornaments – top right */}
+          <div
+            className="absolute -top-20 -right-20 w-72 h-72 rounded-full"
+            style={{ border: '40px solid #dedad4' }}
+          />
+          {/* Circle ornaments – bottom right */}
+          <div
+            className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full"
+            style={{ border: '40px solid #dedad4' }}
+          />
+          {/* Circle ornaments – left middle */}
+          <div
+            className="absolute top-1/2 -left-14 w-44 h-44 rounded-full -translate-y-1/2"
+            style={{ border: '30px solid #dedad4' }}
+          />
+
+          {/* Content */}
+          <div className="relative z-10 text-center space-y-5">
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-lg"
+              style={{ background: '#1a2744' }}
+            >
+              <img src={logoKemendagri} alt="Logo" className="w-11 h-11 object-contain" />
+            </div>
+
+            <h2 className="text-3xl font-extrabold leading-tight" style={{ color: '#1a2744' }}>
+              Selamat Datang!
+            </h2>
+
+            <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
+              Platform resmi pengelolaan Barang Milik Negara (BMN) Itjen Kemendagri. Masukkan akun kedinasan Anda untuk melanjutkan.
+            </p>
+
 
           </div>
         </div>
@@ -283,4 +242,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Login
