@@ -90,40 +90,30 @@ function Dashboard() {
       value: totalAset.toLocaleString('id-ID') + ' Unit',
       subtext: 'Tercatat di SAKTI Kemendagri',
       icon: Archive,
-      iconBg: 'bg-blue-50 text-blue-600',
-      accent: 'border-l-4 border-l-blue-600',
     },
     {
       label: 'Nilai Buku Perolehan',
       value: formatRupiah(totalNilaiPerolehan),
       subtext: 'Akumulasi nilai aset negara',
       icon: Wallet,
-      iconBg: 'bg-indigo-50 text-indigo-600',
-      accent: 'border-l-4 border-l-indigo-600',
     },
     {
       label: 'Kondisi Fisik Baik',
       value: `${baik} Unit (${persenBaik}%)`,
       subtext: 'Siap operasional kantor',
       icon: CheckCircle2,
-      iconBg: 'bg-emerald-50 text-emerald-600',
-      accent: 'border-l-4 border-l-emerald-600',
     },
     {
       label: 'Penugasan Wasrik (Daerah)',
       value: `${dipinjamWasrik} Unit`,
       subtext: 'Surat Izin Pinjam Barang aktif',
       icon: Laptop,
-      iconBg: 'bg-amber-50 text-amber-600',
-      accent: 'border-l-4 border-l-amber-600',
     },
     {
       label: 'Perlu Evaluasi & Servis',
       value: `${evaluasi + perhatian} Unit`,
       subtext: 'Prioritas pemeliharaan / renovasi',
       icon: AlertOctagon,
-      iconBg: 'bg-rose-50 text-rose-600',
-      accent: 'border-l-4 border-l-rose-600',
     },
   ]
 
@@ -219,16 +209,16 @@ function Dashboard() {
             return (
               <div
                 key={card.label}
-                className={`bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-gray-200/80 transition-all hover:shadow-md hover:-translate-y-0.5 ${card.accent}`}
+                className="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-gray-200/80 transition-all hover:shadow-md hover:border-navy/30 hover:-translate-y-0.5 group"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+                  <div className="w-10 h-10 rounded-xl bg-navy/5 text-navy group-hover:bg-navy group-hover:text-white transition-colors flex items-center justify-center">
                     <Icon size={19} />
                   </div>
                   <span className="text-[10px] font-mono font-semibold text-gray-400">BMN</span>
                 </div>
                 <p className="text-xs font-semibold text-gray-500 line-clamp-1">{card.label}</p>
-                <h3 className="text-xl sm:text-2xl 2xl:text-3xl font-extrabold text-gray-900 mt-1 tracking-tight font-display">
+                <h3 className="text-xl sm:text-2xl 2xl:text-3xl font-extrabold text-navy mt-1 tracking-tight font-display">
                   {loading ? '...' : card.value}
                 </h3>
                 <p className="text-[11px] text-gray-400 mt-1 line-clamp-1">{card.subtext}</p>

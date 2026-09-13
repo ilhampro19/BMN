@@ -5,6 +5,10 @@ import { AuthProvider } from './context/AuthContext'
 import './index.css'
 import App from './App.jsx'
 
+// Pastikan tema bersih ke mode normal (terang)
+document.documentElement.classList.remove('dark')
+localStorage.removeItem('bmn_theme')
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
@@ -13,4 +17,4 @@ createRoot(document.getElementById('root')).render(
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
-)
+)

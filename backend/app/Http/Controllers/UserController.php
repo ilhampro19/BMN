@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -157,11 +158,28 @@ class UserController extends Controller
             'unit_kerja' => 'nullable|string|max:255',
             'current_password' => 'nullable|string',
             'new_password' => 'nullable|string|min:6',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $user->name = $request->name;
         if ($request->has('unit_kerja')) {
             $user->unit_kerja = $request->unit_kerja;
+        }
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            $path = $request->file('photo')->store('profile-photos', 'public');
+            $user->photo = $path;
+        } elseif ($request->boolean('remove_photo') || $request->input('remove_photo') === '1' || $request->input('remove_photo') === 'true') {
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+            $user->photo = null;
         }
 
         // If changing password
@@ -192,6 +210,8 @@ class UserController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
                 'unit_kerja' => $user->unit_kerja,
+                'photo' => $user->photo,
+                'photo_url' => $user->photo ? asset('storage/' . $user->photo) : null,
             ],
         ]);
     }

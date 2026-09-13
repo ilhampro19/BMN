@@ -84,6 +84,8 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'role' => $user->role ?? 'admin',
                 'unit_kerja' => $user->unit_kerja ?? 'Inspektorat Jenderal',
+                'photo' => $user->photo,
+                'photo_url' => $user->photo ? asset('storage/' . $user->photo) : null,
             ],
         ]);
     }

@@ -329,9 +329,14 @@ function Users() {
                         {/* User identity */}
                         <td className="py-4 px-5">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-navy/5 border border-navy/10 flex items-center justify-center text-navy font-bold text-sm shrink-0">
-                              {u.name.substring(0, 2).toUpperCase()}
+                            <div className="w-10 h-10 rounded-xl bg-navy/5 dark:bg-white/10 border border-navy/10 dark:border-white/10 flex items-center justify-center text-navy dark:text-white font-bold text-sm shrink-0 overflow-hidden shadow-xs">
+                              {u.photo_url ? (
+                                <img src={u.photo_url} alt={u.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <span>{u.name.substring(0, 2).toUpperCase()}</span>
+                              )}
                             </div>
+
                             <div>
                               <div className="font-bold text-gray-900 flex items-center gap-2">
                                 {u.name}
