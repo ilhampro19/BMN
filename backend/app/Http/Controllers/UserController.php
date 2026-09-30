@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -21,8 +21,8 @@ class UserController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('unit_kerja', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('unit_kerja', 'like', "%{$search}%");
             });
         }
 
@@ -94,7 +94,7 @@ class UserController extends Controller
             $user->unit_kerja = $validated['unit_kerja'];
         }
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -183,14 +183,14 @@ class UserController extends Controller
         }
 
         // If changing password
-        if (!empty($request->new_password)) {
+        if (! empty($request->new_password)) {
             if (empty($request->current_password)) {
                 return response()->json([
                     'message' => 'Kata sandi saat ini wajib diisi untuk mengubah kata sandi.',
                 ], 422);
             }
 
-            if (!Hash::check($request->current_password, $user->password) && $request->current_password !== 'password123') {
+            if (! Hash::check($request->current_password, $user->password) && $request->current_password !== 'password123') {
                 return response()->json([
                     'message' => 'Kata sandi saat ini tidak sesuai.',
                 ], 422);
@@ -211,7 +211,7 @@ class UserController extends Controller
                 'role' => $user->role,
                 'unit_kerja' => $user->unit_kerja,
                 'photo' => $user->photo,
-                'photo_url' => $user->photo ? asset('storage/' . $user->photo) : null,
+                'photo_url' => $user->photo ? asset('storage/'.$user->photo) : null,
             ],
         ]);
     }

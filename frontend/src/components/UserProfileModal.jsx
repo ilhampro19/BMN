@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import { useAuth } from '../context/AuthContext'
 import { API_BASE_URL } from '../lib/api'
+import { showToast } from '../lib/alerts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -215,12 +216,16 @@ function UserProfileModal({ isOpen, onClose }) {
       setPhotoFile(null)
       setRemovePhoto(false)
 
+      showToast.success('Profil Diperbarui', newPassword ? 'Data profil dan kata sandi berhasil disimpan.' : 'Data profil berhasil diperbarui.')
+
       setTimeout(() => {
         setSuccess('')
         onClose()
       }, 1400)
     } catch (err) {
-      setError(err.response?.data?.message || 'Gagal memperbarui profil. Periksa koneksi atau input Anda.')
+      const msg = err.response?.data?.message || 'Gagal memperbarui profil. Periksa koneksi atau input Anda.'
+      setError(msg)
+      showToast.error('Gagal Menyimpan', msg)
     } finally {
       setLoading(false)
     }
@@ -281,7 +286,7 @@ function UserProfileModal({ isOpen, onClose }) {
             </span>
             <span className="text-[11px] text-white/50">• Profil Kedinasan</span>
           </div>
-          <h3 className="text-xl font-bold font-display text-white tracking-tight">
+          <h3 className="text-xl font-bold text-white tracking-tight">
             Pengaturan Akun & Profil
           </h3>
           <p className="text-xs text-white/65 mt-0.5">
@@ -323,7 +328,7 @@ function UserProfileModal({ isOpen, onClose }) {
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-navy via-[#233560] to-navy-light flex items-center justify-center text-white font-bold text-2xl font-display">
+                  <div className="w-full h-full bg-gradient-to-br from-navy via-[#233560] to-navy-light flex items-center justify-center text-white font-bold text-2xl">
                     {initials}
                   </div>
                 )}

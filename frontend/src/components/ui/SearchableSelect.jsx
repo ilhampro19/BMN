@@ -1,4 +1,5 @@
-﻿import Select from 'react-select'
+import Select from 'react-select'
+import CreatableSelect from 'react-select/creatable'
 
 export default function SearchableSelect({
   options = [],
@@ -8,6 +9,9 @@ export default function SearchableSelect({
   isDisabled = false,
   isClearable = false,
   isLoading = false,
+  isSearchable = true,
+  isCreatable = false,
+  createLabel = 'Gunakan nama baru: ',
   className = '',
   name,
   id,
@@ -16,7 +20,9 @@ export default function SearchableSelect({
 }) {
   const selectedOption =
     options.find((opt) => String(opt.value) === String(value)) ||
-    (typeof value === 'object' && value !== null ? value : null)
+    (value ? { value: value, label: value } : null)
+
+  const SelectComponent = isCreatable ? CreatableSelect : Select
 
   const customStyles = {
     control: (base, state) => ({
@@ -99,7 +105,7 @@ export default function SearchableSelect({
 
   return (
     <div className={`relative ${className}`}>
-      <Select
+      <SelectComponent
         id={id}
         name={name}
         options={options}
@@ -113,11 +119,13 @@ export default function SearchableSelect({
         isDisabled={isDisabled}
         isClearable={isClearable}
         isLoading={isLoading}
+        isSearchable={isSearchable}
         styles={customStyles}
         menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
         menuPosition="fixed"
         noOptionsMessage={() => 'Tidak ada pilihan ditemukan'}
         loadingMessage={() => 'Memuat data...'}
+        formatCreateLabel={(input) => `${createLabel}"${input}"`}
         {...props}
       />
       {required && !value && (

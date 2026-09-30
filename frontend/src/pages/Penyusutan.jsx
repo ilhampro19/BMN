@@ -4,9 +4,10 @@ import Layout from '../components/Layout'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import SearchableSelect from '@/components/ui/SearchableSelect'
-import { Calculator, ShieldAlert } from 'lucide-react'
+import { Calculator, ShieldAlert, Car, Laptop } from 'lucide-react'
 import { API_BASE_URL } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
+import { showToast } from '../lib/alerts'
 
 const PENYUSUTAN_API = `${API_BASE_URL}/penyusutan`
 const ITEM_API = `${API_BASE_URL}/item`
@@ -22,6 +23,7 @@ const statusMeta = {
 function Penyusutan() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
+  const isOperator = user?.role === 'operator'
 
   const [riwayat, setRiwayat] = useState([])
   const [itemList, setItemList] = useState([])
@@ -64,14 +66,17 @@ function Penyusutan() {
 
     setCalculating(true)
     try {
-      await axios.post(PENYUSUTAN_API, {
+      const res = await axios.post(PENYUSUTAN_API, {
         item: selectedItem,
         tahun: Number(selectedTahun),
       })
       await fetchAll()
       setSelectedItem('')
+      showToast.success('Penyusutan Berhasil Dihitung', `Kalkulasi depresiasi tahun ${selectedTahun} telah tersimpan.`)
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Gagal menghitung penyusutan')
+      const msg = err.response?.data?.message || 'Gagal menghitung penyusutan'
+      setFormError(msg)
+      showToast.error('Gagal Menghitung Penyusutan', msg)
     } finally {
       setCalculating(false)
     }
@@ -84,18 +89,21 @@ function Penyusutan() {
   return (
     <Layout>
       <div className="mb-7">
-        <h1 className="text-2xl font-semibold text-ink">Perhitungan Penyusutan</h1>
+        <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
+          <Calculator className="text-navy" size={26} />
+          Perhitungan Penyusutan
+        </h1>
         <p className="text-sm text-ink/50 mt-1">
           Hitung nilai buku aset berdasarkan metode garis lurus
         </p>
       </div>
 
       {/* CALCULATION FORM */}
-      {isAdmin ? (
+      {isAdmin || isOperator ? (
         <div className="bg-white border border-black/5 rounded-xl p-6 shadow-sm mb-8 max-w-2xl">
           <div className="flex items-center gap-2 mb-4">
             <Calculator size={16} className="text-navy" />
-            <h2 className="text-sm font-semibold text-ink">Hitung Penyusutan Baru</h2>
+            <h2 className="text-sm font-bold text-ink">Hitung Penyusutan Baru</h2>
           </div>
 
           <form onSubmit={handleHitung} className="flex items-end gap-3">
@@ -105,11 +113,16 @@ function Penyusutan() {
                 id="item"
                 value={selectedItem}
                 onChange={(val) => setSelectedItem(val)}
-                options={itemList.map((item) => ({
-                  value: item._id || item.id,
-                  label: `${item.itemName} (${item.itemCode})`,
-                }))}
-                placeholder="Pilih barang..."
+                options={itemList.map((item) => {
+                  const isVeh = item.nomor_polisi || item.jenis_kendaraan || (item.kategoriItem?.kategoriItemName || '').toLowerCase().includes('kendaraan')
+                  return {
+                    value: item._id || item.id,
+                    label: isVeh
+                      ? `🚗 ${item.itemName} [${item.nomor_polisi || 'Plat Dinas'}] (${item.itemCode})`
+                      : `💻 ${item.itemName} (${item.itemCode})`,
+                  }
+                })}
+                placeholder="Pilih barang atau kendaraan..."
                 required
                 className="mt-1"
               />
@@ -150,7 +163,7 @@ function Penyusutan() {
       )}
 
       {/* HISTORY TABLE */}
-      <p className="text-sm font-semibold text-ink mb-3">Riwayat Penyusutan</p>
+      <p className="text-sm font-semibold text-ink mb-3">Riwayat Penyusutan BMN &amp; Kendaraan</p>
 
       {loading && <p className="text-sm text-ink/50">Memuat data...</p>}
       {error && <p className="text-sm text-rust">{error}</p>}
@@ -160,7 +173,7 @@ function Penyusutan() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-black/5">
-                <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Nama Barang</th>
+                <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Nama Barang / Kendaraan</th>
                 <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Tahun</th>
                 <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Nilai Awal</th>
                 <th className="text-left text-xs font-semibold text-ink/50 px-5 py-3">Beban Penyusutan</th>
@@ -183,12 +196,21 @@ function Penyusutan() {
                 const beban = r.bebanPenyusutan ?? 0
                 const nilaiBuku = r.nilaiBukuAkhir ?? 0
                 const persen = r.persenUmur ?? r.persenUmurTerpakai ?? 0
+                const isVeh = r.item?.nomor_polisi || r.item?.jenis_kendaraan
 
                 return (
                   <tr key={r._id || r.id} className="border-b border-black/5 last:border-0 hover:bg-gray-50/50">
                     <td className="px-5 py-4">
-                      <div className="text-sm text-ink font-medium">{r.item?.itemName || '—'}</div>
-                      <div className="text-xs text-ink/40 font-mono-ledger">
+                      <div className="text-sm text-ink font-medium flex items-center gap-1.5 flex-wrap">
+                        {isVeh ? <Car size={14} className="text-navy" /> : <Laptop size={14} className="text-slate-600" />}
+                        <span>{r.item?.itemName || '—'}</span>
+                        {r.item?.nomor_polisi && (
+                          <span className="bg-navy text-white text-[10px] font-mono px-2 py-0.5 rounded font-bold">
+                            {r.item.nomor_polisi}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-ink/40 font-mono-ledger mt-0.5">
                         {r.item?.kode_bmn ? `SAKTI: ${r.item.kode_bmn}` : r.item?.itemCode} {r.item?.nup ? `(NUP ${r.item.nup})` : ''}
                       </div>
                     </td>

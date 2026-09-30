@@ -8,6 +8,7 @@ import SearchableSelect from '@/components/ui/SearchableSelect'
 import { Plus, Trash2, Wrench, CheckCircle2, TrendingUp, AlertCircle, X } from 'lucide-react'
 import { API_BASE_URL } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
+import { showAlert, showToast } from '../lib/alerts'
 
 const RENOVASI_API = `${API_BASE_URL}/renovasi`
 const ITEM_API = `${API_BASE_URL}/item`
@@ -90,23 +91,37 @@ function Renovasi() {
       await axios.post(RENOVASI_API, payload)
       await fetchAll()
       closeModal()
+      showToast.success(
+        'Renovasi Berhasil Dicatat',
+        payload.kapitalisasi
+          ? 'Biaya renovasi telah dikapitalisasi ke nilai perolehan aset.'
+          : 'Catatan pemeliharaan rutin berhasil disimpan.'
+      )
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Gagal menyimpan data renovasi.')
+      const msg = err.response?.data?.message || 'Gagal menyimpan data renovasi.'
+      setFormError(msg)
+      showToast.error('Gagal Menyimpan Renovasi', msg)
     } finally {
       setSubmitting(false)
     }
   }
 
   async function handleDelete(id) {
-    if (!window.confirm('Yakin ingin menghapus riwayat renovasi ini? Nilai kapitalisasi barang akan dikembalikan.')) {
-      return
-    }
+    const confirmed = await showAlert.confirm({
+      title: 'Hapus Riwayat Renovasi?',
+      text: 'Yakin ingin menghapus riwayat renovasi ini? Nilai kapitalisasi barang akan dikembalikan ke nilai sebelumnya.',
+      confirmText: 'Ya, Hapus & Rollback',
+      cancelText: 'Batal',
+      isDestructive: true,
+    })
+    if (!confirmed) return
 
     try {
       await axios.delete(`${RENOVASI_API}/${id}`)
       await fetchAll()
+      showToast.success('Riwayat Renovasi Dihapus', 'Nilai perolehan aset telah dikembalikan.')
     } catch (err) {
-      alert('Gagal menghapus data renovasi.')
+      showAlert.error('Gagal Menghapus Renovasi', err.response?.data?.message || 'Terjadi kesalahan saat menghapus data.')
     }
   }
 
@@ -124,16 +139,13 @@ function Renovasi() {
 
   return (
     <Layout>
-      {/* BREADCRUMB */}
-      <p className="text-xs text-ink/40 mb-4">
-        Aplikasi Utama <span className="mx-1">›</span>
-        <span className="text-navy font-medium">Renovasi & Pemeliharaan</span>
-      </p>
-
       {/* HEADER ROW */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-ink">Renovasi & Pemeliharaan BMN</h1>
+          <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
+            <Wrench className="text-navy" size={26} />
+            Renovasi & Pemeliharaan BMN
+          </h1>
           <p className="text-sm text-ink/50 mt-1">
             Catat perbaikan aset, kapitalisasi nilai buku, dan perpanjangan masa manfaat
           </p>
@@ -175,7 +187,7 @@ function Renovasi() {
       {/* TABLE DATA */}
       <div className="bg-white border border-black/5 rounded-xl overflow-hidden shadow-sm">
         <div className="px-6 py-4 border-b border-black/5 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-ink">Riwayat Pekerjaan Renovasi & Pemeliharaan</h2>
+          <h2 className="text-sm font-bold text-ink">Riwayat Pekerjaan Renovasi & Pemeliharaan</h2>
         </div>
 
         {loading && <p className="p-6 text-sm text-ink/50">Memuat data...</p>}

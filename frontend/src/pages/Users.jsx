@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { API_BASE_URL } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
+import { showAlert, showToast } from '../lib/alerts'
 
 const API_URL = `${API_BASE_URL}/users`
 
@@ -103,13 +104,13 @@ function Users() {
       const res = await axios.get(API_URL)
       setUsersList(res.data)
     } catch (err) {
-      showAlert('error', 'Gagal memuat daftar pengguna.')
+      showToast.error('Gagal Memuat Data', 'Tidak dapat memuat daftar pengguna.')
     } finally {
       setLoading(false)
     }
   }
 
-  function showAlert(type, text) {
+  function showInlineAlert(type, text) {
     setAlertMsg({ type, text })
     setTimeout(() => setAlertMsg(null), 4000)
   }
@@ -154,11 +155,11 @@ function Users() {
           payload.password = form.password
         }
         await axios.put(`${API_URL}/${editingId}`, payload)
-        showAlert('success', 'Data pengguna berhasil diperbarui.')
+        showToast.success('Pengguna Diperbarui', 'Data pengguna berhasil diperbarui.')
       } else {
         // Create user
         await axios.post(API_URL, form)
-        showAlert('success', 'Pengguna baru berhasil didaftarkan.')
+        showToast.success('Pengguna Didaftarkan', 'Akun pengguna baru berhasil dibuat.')
       }
 
       setShowModal(false)
@@ -183,7 +184,7 @@ function Users() {
         password: res.data.default_password,
       })
     } catch (err) {
-      showAlert('error', err.response?.data?.message || 'Gagal mereset kata sandi.')
+      showToast.error('Reset Password Gagal', err.response?.data?.message || 'Gagal mereset kata sandi.')
       setResetTargetUser(null)
     } finally {
       setResetSubmitting(false)
@@ -195,11 +196,11 @@ function Users() {
     setDeleteSubmitting(true)
     try {
       await axios.delete(`${API_URL}/${deleteTargetUser.id}`)
-      showAlert('success', `Akun ${deleteTargetUser.name} berhasil dihapus.`)
+      showToast.success('Akun Dihapus', `Akun ${deleteTargetUser.name} berhasil dihapus.`)
       setDeleteTargetUser(null)
       fetchUsers()
     } catch (err) {
-      showAlert('error', err.response?.data?.message || 'Gagal menghapus pengguna.')
+      showToast.error('Gagal Menghapus', err.response?.data?.message || 'Gagal menghapus pengguna.')
     } finally {
       setDeleteSubmitting(false)
     }
@@ -220,21 +221,21 @@ function Users() {
       <div className="space-y-6 max-w-7xl mx-auto">
 
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy font-display tracking-tight flex items-center gap-2.5">
-              <Shield className="text-amber-600" size={26} />
+            <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
+              <Shield className="text-navy" size={26} />
               Manajemen Pengguna (User)
             </h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <p className="text-sm text-ink/50 mt-1">
               Kelola akun pegawai kedinasan, unit kerja, hak akses (role), dan pengaturan ulang kata sandi BMN Itjen.
             </p>
           </div>
           <Button
             onClick={openCreateModal}
-            className="bg-navy hover:bg-navy/90 text-white font-semibold rounded-xl shadow-md flex items-center gap-2 h-11 px-5 cursor-pointer self-start sm:self-auto"
+            className="bg-navy hover:bg-navy-light text-white font-semibold rounded-xl shadow-sm flex items-center gap-2 h-10 px-4 cursor-pointer self-start sm:self-auto"
           >
-            <UserPlus size={18} />
+            <UserPlus size={16} />
             <span>Tambah Pengguna</span>
           </Button>
         </div>

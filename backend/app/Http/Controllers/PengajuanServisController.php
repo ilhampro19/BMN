@@ -184,6 +184,14 @@ class PengajuanServisController extends Controller
     {
         $pengajuan = PengajuanServis::findOrFail($id);
 
+        $validated = $request->validate([
+            'catat_ke_renovasi' => 'nullable|boolean',
+            'biaya_aktual' => 'nullable|numeric|min:0',
+            'kapitalisasi' => 'nullable|boolean',
+            'tambah_umur_tahun' => 'nullable|integer|min:0',
+            'deskripsi_tambahan' => 'nullable|string|max:500',
+        ]);
+
         $pengajuan->update([
             'status' => 'selesai',
         ]);
@@ -194,16 +202,33 @@ class PengajuanServisController extends Controller
                 'status_penggunaan' => 'digunakan',
             ]);
 
-            // Jika ada biaya dan opsi catat riwayat renovasi
-            if ($request->boolean('catat_ke_renovasi') && $pengajuan->estimasi_biaya > 0) {
+            $biayaAktual = $validated['biaya_aktual'] ?? $pengajuan->estimasi_biaya ?? 0;
+            $catataRenovasi = $validated['catat_ke_renovasi'] ?? false;
+
+            // Catat ke histori renovasi jika diminta dan biaya > 0
+            if ($catataRenovasi && $biayaAktual > 0) {
+                $kapitalisasi = $validated['kapitalisasi'] ?? false;
+                $tambahUmur = $validated['tambah_umur_tahun'] ?? 0;
+                $deskripsiTambahan = $validated['deskripsi_tambahan'] ?? '';
+
+                $deskripsiRenovasi = 'Perbaikan servis pengajuan dari '.$pengajuan->nama_pemohon.': '.$pengajuan->deskripsi_kerusakan;
+                if ($deskripsiTambahan) {
+                    $deskripsiRenovasi .= '. '.$deskripsiTambahan;
+                }
+
                 Renovasi::create([
                     'item_id' => $pengajuan->item_id,
                     'tanggal_renovasi' => now()->toDateString(),
-                    'biaya_renovasi' => $pengajuan->estimasi_biaya,
-                    'tambah_umur_tahun' => 0,
-                    'kapitalisasi' => false,
-                    'deskripsi' => 'Perbaikan servis pengajuan dari '.$pengajuan->nama_pemohon.': '.$pengajuan->deskripsi_kerusakan,
+                    'biaya_renovasi' => $biayaAktual,
+                    'tambah_umur_tahun' => $tambahUmur,
+                    'kapitalisasi' => $kapitalisasi,
+                    'deskripsi' => $deskripsiRenovasi,
                 ]);
+
+                // Jika dikapitalisasi, update nilai buku barang
+                if ($kapitalisasi) {
+                    $pengajuan->item->increment('nilaiPerolehan', $biayaAktual);
+                }
             }
         }
 

@@ -15,7 +15,7 @@ import {
   Wrench,
   ArrowUpRight,
   TrendingUp,
-  Sparkles,
+  LayoutDashboard,
   Calendar
 } from 'lucide-react'
 import { API_BASE_URL } from '../lib/api'
@@ -78,7 +78,7 @@ function Dashboard() {
   const baik = items.filter((i) => i.kondisi === 'baik').length
   const evaluasi = items.filter((i) => i.kondisi === 'evaluasi').length
   const perhatian = items.filter((i) => i.kondisi === 'perhatian').length
-  const dipinjamWasrik = items.filter((i) => i.status_penggunaan === 'dipinjam_wasrik').length
+  const dipinjamWasrik = items.filter((i) => i.status_penggunaan === 'dipinjam_wasrik' || i.status_penggunaan === 'dipinjam_kendaraan' || i.status_penggunaan === 'dipinjam').length
 
   const persenBaik = totalAset > 0 ? Math.round((baik / totalAset) * 100) : 0
   const persenEvaluasi = totalAset > 0 ? Math.round((evaluasi / totalAset) * 100) : 0
@@ -156,8 +156,6 @@ function Dashboard() {
               <span className="font-bold text-navy">Kementerian Dalam Negeri</span>
               <span>•</span>
               <span>Inspektorat Jenderal</span>
-              <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline text-gold font-bold">Satker 010.05</span>
             </div>
             <div className="flex items-center gap-1.5 text-gray-400">
               <Calendar size={13} />
@@ -166,18 +164,15 @@ function Dashboard() {
           </div>
 
           {/* Main Headline & Action Deck */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-navy/5 text-navy text-xs font-semibold mb-2">
-                <Sparkles size={13} className="text-amber-600" />
-                {isStaf ? 'Portal Pelayanan Inventaris Staf' : isPimpinan ? 'Executive Summary Aset & BMN' : 'Ikhtisar Tata Kelola Aset Negara'}
-              </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl font-extrabold text-gray-900 font-display tracking-tight leading-tight">
+              <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
+                <LayoutDashboard className="text-navy" size={26} />
                 {isStaf
                   ? 'Katalog Inventaris & Layanan Pemeliharaan'
                   : 'Sistem Manajemen Aset & Kekayaan Negara'}
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 max-w-3xl mt-1.5 leading-relaxed">
+              <p className="text-sm text-ink/50 mt-1 max-w-3xl leading-relaxed">
                 Pemantauan real-time kekayaan BMN di lingkungan Sekretariat dan Seluruh Inspektorat Wilayah (Irwil I s.d. Khusus), audit wasrik reguler, alur nota dinas, serta depresiasi nilai buku.
               </p>
             </div>
@@ -218,7 +213,7 @@ function Dashboard() {
                   <span className="text-[10px] font-mono font-semibold text-gray-400">BMN</span>
                 </div>
                 <p className="text-xs font-semibold text-gray-500 line-clamp-1">{card.label}</p>
-                <h3 className="text-xl sm:text-2xl 2xl:text-3xl font-extrabold text-navy mt-1 tracking-tight font-display">
+                <h3 className="text-xl sm:text-2xl font-bold text-navy mt-1 tracking-tight">
                   {loading ? '...' : card.value}
                 </h3>
                 <p className="text-[11px] text-gray-400 mt-1 line-clamp-1">{card.subtext}</p>
@@ -237,7 +232,7 @@ function Dashboard() {
             <div className="bg-white rounded-2xl shadow-xs border border-gray-200/80 overflow-hidden">
               <div className="p-4 sm:p-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900 font-display flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
                     <span>Daftar Inventaris Terkini</span>
                     <span className="text-xs font-mono font-normal text-gray-400">({asetTerbaru.length} Item Terbaru)</span>
                   </h3>
@@ -287,7 +282,7 @@ function Dashboard() {
                               {idx + 1}
                             </td>
                             <td className="py-3.5 px-4">
-                              <div className="font-bold text-gray-900 text-sm font-display">{aset.itemName}</div>
+                              <div className="font-bold text-gray-900 text-sm">{aset.itemName}</div>
                               <div className="text-[11px] text-gray-500 font-mono mt-0.5">
                                 {aset.itemCode} • NUP: {aset.nup || '0001'}
                               </div>
@@ -330,7 +325,7 @@ function Dashboard() {
             <div className="bg-white rounded-2xl p-5 shadow-xs border border-gray-200/80 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900 font-display">Proporsi Kelayakan Fisik BMN</h4>
+                  <h4 className="text-sm font-bold text-gray-900">Proporsi Kelayakan Fisik BMN</h4>
                   <p className="text-xs text-gray-500 mt-0.5">Evaluasi kesiapan pakai seluruh aset dinas Inspektorat Jenderal</p>
                 </div>
                 <span className="text-xs font-mono font-bold text-navy">{totalAset} Total Unit</span>
@@ -376,7 +371,7 @@ function Dashboard() {
                     <Building2 size={16} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-gray-900 font-display">Sebaran Unit Kerja</h4>
+                    <h4 className="text-sm font-bold text-gray-900">Sebaran Unit Kerja</h4>
                     <p className="text-[11px] text-gray-500">Distribusi per Irwil / Sekretariat</p>
                   </div>
                 </div>
@@ -419,7 +414,7 @@ function Dashboard() {
                       Audit Lapangan
                     </span>
                   </div>
-                  <h4 className="text-base font-bold font-display">Penugasan Wasrik Daerah</h4>
+                  <h4 className="text-base font-bold">Penugasan Wasrik Daerah</h4>
                   <p className="text-xs text-white/75 leading-relaxed">
                     Saat ini tercatat <strong className="text-white font-bold">{dipinjamWasrik} aset</strong> sedang dibawa auditor untuk pemeriksaan reguler di luar kantor.
                   </p>
@@ -440,7 +435,7 @@ function Dashboard() {
                   <Wrench size={16} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900 font-display">Layanan Pemeliharaan BMN</h4>
+                  <h4 className="text-sm font-bold text-gray-900">Layanan Pemeliharaan BMN</h4>
                   <p className="text-[11px] text-gray-500">Usulan Nota Dinas Perbaikan</p>
                 </div>
               </div>

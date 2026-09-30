@@ -30,6 +30,21 @@ function Login() {
     }
   }
 
+  async function handleQuickLogin(demoEmail, demoPassword = 'password123') {
+    setEmail(demoEmail)
+    setPassword(demoPassword)
+    setError('')
+    setLoading(true)
+    try {
+      await login(demoEmail, demoPassword)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Gagal login cepat.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-3 sm:p-6 lg:p-8 2xl:p-12 font-sans" style={{ background: '#eceae5' }}>
       {/* MAIN CARD (Fluid & Responsive: Mobile, Tablet, Laptop, Desktop, TV) */}
@@ -43,7 +58,7 @@ function Login() {
           {/* Logo + Title */}
           <div className="flex flex-col items-center mb-7 text-center">
             <img src={logoKemendagri} alt="Logo Kemendagri" className="w-14 h-14 object-contain mb-3" />
-            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Masuk ke Sistem BMN</h1>
+            <h1 className="text-2xl font-bold text-ink tracking-tight">Masuk ke Sistem BMN</h1>
             <p className="text-[11px] text-gray-400 mt-1 tracking-wide">INSPEKTORAT JENDERAL KEMENDAGRI</p>
           </div>
 
@@ -116,7 +131,69 @@ function Login() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-[10px] text-gray-300">
+          {/* ── QUICK DEMO LOGIN (PRESENTASI) ── */}
+          <div className="mt-6 pt-5 border-t border-gray-200/80">
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider flex items-center gap-1">
+              </span>
+              <span className="text-[9px] text-gray-400 font-mono">1-Klik Langsung Masuk</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('irjen@kemendagri.go.id')}
+                disabled={loading}
+                className="px-2.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-left transition-all cursor-pointer group disabled:opacity-50"
+              >
+                <div className="text-[11px] font-bold text-amber-900 flex items-center justify-between">
+                  <span>👑 Pimpinan</span>
+                  <span className="text-[9px] text-amber-700 font-normal">Irjen</span>
+                </div>
+                <div className="text-[9px] text-amber-700/80 font-mono truncate mt-0.5">irjen@kemendagri.go.id</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('operator.irwil1@kemendagri.go.id')}
+                disabled={loading}
+                className="px-2.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-left transition-all cursor-pointer group disabled:opacity-50"
+              >
+                <div className="text-[11px] font-bold text-blue-900 flex items-center justify-between">
+                  <span>📋 Operator TU</span>
+                  <span className="text-[9px] text-blue-700 font-normal">Irwil 1</span>
+                </div>
+                <div className="text-[9px] text-blue-700/80 font-mono truncate mt-0.5">operator.irwil1@...</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('admin.bmn@kemendagri.go.id')}
+                disabled={loading}
+                className="px-2.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-left transition-all cursor-pointer group disabled:opacity-50"
+              >
+                <div className="text-[11px] font-bold text-purple-900 flex items-center justify-between">
+                  <span>🛡️ Admin BMN</span>
+                  <span className="text-[9px] text-purple-700 font-normal">Super</span>
+                </div>
+                <div className="text-[9px] text-purple-700/80 font-mono truncate mt-0.5">admin.bmn@...</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('staf.budi@kemendagri.go.id')}
+                disabled={loading}
+                className="px-2.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-left transition-all cursor-pointer group disabled:opacity-50"
+              >
+                <div className="text-[11px] font-bold text-emerald-900 flex items-center justify-between">
+                  <span>👤 Staf Pegawai</span>
+                  <span className="text-[9px] text-emerald-700 font-normal">Auditor</span>
+                </div>
+                <div className="text-[9px] text-emerald-700/80 font-mono truncate mt-0.5">staf.budi@...</div>
+              </button>
+            </div>
+          </div>
+
+          <p className="mt-6 text-center text-[10px] text-gray-400">
             &copy; {new Date().getFullYear()} Inspektorat Jenderal Kementerian Dalam Negeri
           </p>
         </div>
@@ -225,7 +302,7 @@ function Login() {
               <img src={logoKemendagri} alt="Logo" className="w-11 h-11 object-contain" />
             </div>
 
-            <h2 className="text-3xl font-extrabold leading-tight" style={{ color: '#1a2744' }}>
+            <h2 className="text-3xl font-bold text-ink leading-tight">
               Selamat Datang!
             </h2>
 
@@ -242,4 +319,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Login

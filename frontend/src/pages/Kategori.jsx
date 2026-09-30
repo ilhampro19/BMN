@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { API_BASE_URL } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
+import { showAlert, showToast } from '../lib/alerts'
 
 const API_URL = `${API_BASE_URL}/kategori-item`
 
@@ -100,28 +101,39 @@ function Kategori() {
       if (editingId) {
         // Edit mode - update existing category
         await axios.put(`${API_URL}/${editingId}`, payload)
+        showToast.success('Kategori Berhasil Diperbarui', `Kategori "${form.kategoriItemName}" telah disimpan.`)
       } else {
         // Create mode - add new category
         await axios.post(API_URL, payload)
+        showToast.success('Kategori Baru Ditambahkan', `Kategori "${form.kategoriItemName}" siap digunakan.`)
       }
       await fetchKategori()
       setShowModal(false)
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Gagal menyimpan data')
+      const msg = err.response?.data?.message || 'Gagal menyimpan data kategori.'
+      setFormError(msg)
+      showToast.error('Gagal Menyimpan Kategori', msg)
     } finally {
       setSubmitting(false)
     }
   }
 
   async function handleDelete(id, nama) {
-    const confirmed = window.confirm(`Hapus kategori "${nama}"? Tindakan ini tidak bisa dibatalkan.`)
+    const confirmed = await showAlert.confirm({
+      title: 'Hapus Kategori BMN?',
+      text: `Apakah Anda yakin ingin menghapus kategori "${nama}"?`,
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDestructive: true,
+    })
     if (!confirmed) return
 
     try {
       await axios.delete(`${API_URL}/${id}`)
       await fetchKategori()
+      showToast.success('Kategori Dihapus', `Kategori "${nama}" telah berhasil dihapus.`)
     } catch (err) {
-      alert('Gagal menghapus kategori')
+      showAlert.error('Gagal Menghapus Kategori', err.response?.data?.message || 'Kategori ini mungkin masih digunakan oleh aset BMN.')
     }
   }
 
@@ -129,7 +141,10 @@ function Kategori() {
     <Layout>
       <div className="flex items-start justify-between mb-7">
         <div>
-          <h1 className="text-2xl font-semibold text-ink">Kategori Barang</h1>
+          <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
+            <Tag className="text-navy" size={26} />
+            Kategori Barang
+          </h1>
           <p className="text-sm text-ink/50 mt-1">
             Kelola klasifikasi aset Barang Milik Negara (BMN) dan parameter penyusutan
           </p>

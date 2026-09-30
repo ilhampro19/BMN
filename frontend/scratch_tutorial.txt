@@ -1,0 +1,146 @@
+Berikut adalah **panduan isian lengkap setiap kolom pada modal formulir pendaftaran aset baru (sesuai screenshot Anda)** beserta **skenario pengujian lengkap 100% dari awal sampai akhir**.
+
+---
+
+# 📝 1. Data Isian Lengkap Formulir (Copy-Paste Ready)
+
+Silakan isi formulir yang sedang terbuka di layar Anda dengan data berikut:
+
+| Nama Kolom / Field | Nilai yang Diisi (Copy-Paste) | Keterangan |
+| :--- | :--- | :--- |
+| **Kodefikasi Internal \*** | `BMN-ITJ-2022-SRV01` | Kode penomoran internal BMN |
+| **NUP (No Urut Pendaftaran) \*** | `0001` | Nomor urut pendaftaran |
+| **Kode Akun SAKTI** | `3.05.02.01.001` | Kodefikasi standar Bagan Akun Standar |
+| **Nama Barang / Jenis Aset \*** | `Server Database Sistem Pengawasan APIP` | Nama resmi aset |
+| **Merk / Spesifikasi Tipe** | `Dell PowerEdge R750xs Rack Server` | Spesifikasi fisik barang |
+| **Nomor Seri (Serial Number - SN)** | `CN-0K793H-72872` | Nomor seri pabrikan |
+| **Kategori BMN \*** | *Pilih:* **Peralatan Komputer & TI Pengawasan** | Masa manfaat 4 tahun (tarif 25%/tahun) |
+| **Tahun Perolehan \*** | `2022` | Ubah dari 2026 ke **2022** (agar bisa hitung depresiasi) |
+| **Nilai Perolehan (Rp) \*** | `100000000` | Rp 100.000.000 *(ketik angka tanpa titik)* |
+| **Unit Kerja Itjen \*** | *Pilih:* **Sekretariat Itjen** | Unit pemilik aset |
+| **Pilihan Ruangan Gedung \*** | *Pilih:* **Lantai 1 - Ruang Server & Data Center Pengawasan** | Posisi ruangan gedung |
+| **Kondisi Fisik** | *Pilih:* **Baik (Siap Operasional)** | Kondisi awal |
+| **Status Penggunaan** | *Pilih:* **Digunakan** | Status operasional |
+| **Penanggung Jawab (PJ)** | `Tim IT & Helpdesk Itjen` | Pegawai / tim penanggung jawab |
+
+👉 **Klik tombol [ Simpan Aset ] di kanan bawah.**
+
+---
+
+# 🔄 2. Skenario Lengkap Uji Coba Seluruh Fitur (10 Langkah)
+
+Setelah data barang tersimpan, ikuti alur di bawah ini untuk mencoba **seluruh modul sistem**:
+
+---
+
+### 🔹 Langkah 1: Generate & Cetak Label QR Code Aset
+1. Di tabel **Data BMN**, cari barang `Server Database Sistem Pengawasan APIP` yang baru dibuat.
+2. Klik tombol **QR Code** di baris barang tersebut.
+3. Modal QR Code akan tampil berisi data lengkap barang & NUP.
+4. Klik tombol **Cetak / Unduh Label** *(simulasi stiker inventaris fisik BMN)*.
+
+---
+
+### 🔹 Langkah 2: Hitung Penyusutan Awal (Tahun 2024)
+1. Masuk ke menu **Penyusutan** di sidebar.
+2. Pada form **Hitung Penyusutan Baru**:
+   * **Barang**: Pilih `Server Database Sistem Pengawasan APIP`
+   * **Tahun**: `2024` *(umur berjalan = 2 tahun dari 2022)*
+   * Klik **"Hitung & Simpan"**.
+3. **Hasil di Tabel**:
+   * **Nilai Awal**: `Rp 100.000.000`
+   * **Beban Penyusutan**: `-Rp 25.000.000` *(25% per tahun)*
+   * **Nilai Buku Akhir (2024)**: **Rp 50.000.000**
+   * **% Umur Terpakai**: `50%`
+
+---
+
+### 🔹 Langkah 3: Staf Mengajukan Servis / Kerusakan (Role: Staf)
+1. Logout, lalu login sebagai **Staf Pegawai**:
+   * Email: `staf.budi@kemendagri.go.id` | Password: `password123`
+2. Masuk ke menu **Pengajuan Servis** ➔ Klik **"Buat Pengajuan Servis"**.
+3. Isi data pengajuan:
+   * **Barang**: Pilih `Server Database Sistem Pengawasan APIP`
+   * **Kategori Servis**: `Perbaikan Ringan`
+   * **Deskripsi Kerusakan**: *"Kipas pendingin server berbunyi bising dan suhu prosesor sering overheat."*
+   * **Tanggal Pengajuan**: Hari ini
+4. Klik **Kirim Pengajuan**. Status menjadi: 🟡 **Diajukan (Menunggu Operator)**.
+
+---
+
+### 🔹 Langkah 4: Operator Melakukan Cek Fisik & Estimasi Biaya (Role: Operator)
+1. Logout, lalu login sebagai **Operator TU**:
+   * Email: `operator.irwil1@kemendagri.go.id` | Password: `password123`
+2. Masuk ke menu **Persetujuan (Approval)** ➔ Tab **Pengajuan Servis**.
+3. Cari tiket pengajuan dari Staf Budi ➔ Klik tombol **"Verifikasi (Cek Fisik)"**.
+4. Masukkan data verifikasi:
+   * **Catatan Operator**: *"Telah dicek ke ruang data center. Fan pendingin kotor dan perlu penggantian thermal paste."*
+   * **Estimasi Biaya**: `2500000` *(Rp 2.500.000)*
+5. Klik **"Verifikasi & Teruskan ke Pimpinan"**. Status menjadi: 🔵 **Diverifikasi Operator**.
+
+---
+
+### 🔹 Langkah 5: Pimpinan Menyetujui Anggaran Servis (Role: Pimpinan / Irjen)
+1. Logout, lalu login sebagai **Pimpinan (Irjen)**:
+   * Email: `irjen@kemendagri.go.id` | Password: `password123`
+2. Masuk ke menu **Persetujuan (Approval)** ➔ Tab **Pengajuan Servis**.
+3. Tinjau catatan kerusakan dan estimasi biaya Rp 2.500.000.
+4. Klik tombol **"Setujui (Approve)"**. Status menjadi: 🟢 **Disetujui Pimpinan**.
+
+---
+
+### 🔹 Langkah 6: Selesaikan Servis Biasa
+1. Login kembali sebagai **Operator** (`operator.irwil1@kemendagri.go.id`) atau **Admin**.
+2. Masuk ke menu **Pengajuan Servis** atau **Approval**.
+3. Klik tombol **"Selesai Servis"** pada tiket tersebut.
+4. Barang kembali aktif dengan status normal di sistem.
+
+---
+
+### 🔹 Langkah 7: Catat Upgrade / Renovasi yang Dikapitalisasi (Role: Admin)
+*Sekarang kita simulasikan upgrade besar komponen senilai Rp 20.000.000 yang menambah nilai buku aset.*
+
+1. Login sebagai **Admin BMN**:
+   * Email: `admin.bmn@kemendagri.go.id` | Password: `password123`
+2. Masuk ke menu **Renovasi & Pemeliharaan** ➔ Klik **"Catat Renovasi Baru"**.
+3. Isi data:
+   * **Barang**: `Server Database Sistem Pengawasan APIP`
+   * **Tanggal**: Hari ini
+   * **Biaya Renovasi**: `20000000` *(Rp 20.000.000)*
+   * **Perpanjangan Umur**: `1` (tahun)
+   * **Kebijakan Akuntansi**: Pastikan centang **☑️ Kapitalisasi Biaya ke Nilai Perolehan Aset BMN** aktif.
+   * **Keterangan**: *"Penggantian modul SSD NVMe 4TB enterprise dan power supply redundan."*
+4. Klik **"Simpan Renovasi"**.
+5. Buka menu **Data BMN**: Nilai Perolehan server otomatis bertambah menjadi **Rp 120.000.000**.
+
+---
+
+### 🔹 Langkah 8: Buktikan Penyusutan Ikut Berubah
+1. Buka menu **Penyusutan**.
+2. Pada form **Hitung Penyusutan Baru**:
+   * Pilih `Server Database Sistem Pengawasan APIP`
+   * Pilih Tahun: `2024` (atau `2025`)
+   * Klik **"Hitung & Simpan"**.
+3. **Lihat Hasil yang Terupdate**:
+   * **Nilai Awal Dasar Baru**: **Rp 120.000.000** *(naik dari Rp 100jt)*
+   * **Beban Penyusutan Baru**: **-Rp 30.000.000** *(naik dari Rp 25jt)*
+   * **Nilai Buku Akhir**: Menghitung otomatis dari dasar Rp 120.000.000.
+
+---
+
+### 🔹 Langkah 9: Peminjaman Barang Wasrik (Audit Luar Daerah)
+1. Masuk ke menu **Peminjaman Wasrik** ➔ Klik **"Ajukan Peminjaman"**.
+2. Pilih barang `Server Database`, masukkan nama auditor peminjam, nomor surat tugas wasrik, dan tanggal peminjaman.
+3. Login sebagai **Pimpinan** (`irjen@kemendagri.go.id`) ➔ Menu **Approval** ➔ Tab **Peminjaman Wasrik** ➔ Klik **Setujui**.
+4. Cek di **Data BMN**: Status barang berubah menjadi **"Dipinjam Wasrik"**.
+5. Di menu **Peminjaman Wasrik**, klik **"Konfirmasi Pengembalian"** jika pemeriksaan selesai.
+
+---
+
+### 🔹 Langkah 10: Mutasi Ruangan & Cetak Kartu Inventaris Ruangan (KIR)
+1. Masuk ke menu **Pelacakan & Mutasi** ➔ Klik **"Ajukan Mutasi Lokasi"**.
+2. Pilih barang, ubah ruangan tujuan ke: *"Lantai 2 - Ruang Kerja Bagian Umum & Kepegawaian"*.
+3. Klik **Setujui Mutasi**.
+4. Masuk ke menu **KIR (Kartu Inventaris Ruangan)**:
+   * Pilih ruangan: `Lantai 2 - Ruang Kerja Bagian Umum & Kepegawaian`.
+   * Klik **Cetak KIR / Print Berita Acara** untuk mencetak dokumen format resmi siap tanda tangan.

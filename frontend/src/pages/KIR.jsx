@@ -15,6 +15,7 @@ function KIR() {
   const [loading, setLoading] = useState(true)
   const [selectedUnit, setSelectedUnit] = useState('Semua Unit Kerja')
   const [selectedRoom, setSelectedRoom] = useState(RUANGAN_GEDUNG_ITJEN[0])
+  const [filterTipe, setFilterTipe] = useState('terikat_ruangan')
   const [search, setSearch] = useState('')
 
   useEffect(() => {
@@ -38,19 +39,28 @@ function KIR() {
     }
   }
 
-  // Daftar ruangan resmi dan unik dari data
-  const availableRooms = [...new Set([...RUANGAN_GEDUNG_ITJEN, ...items.map((i) => i.lokasi_ruangan).filter(Boolean)])]
+  // Daftar ruangan resmi dan unik dari data (kecuali lokasi mobile/pool)
+  const availableRooms = [
+    ...new Set([
+      ...RUANGAN_GEDUNG_ITJEN,
+      ...items
+        .filter((i) => !i.lokasi_ruangan?.includes('Mobile') && !i.lokasi_ruangan?.includes('Pool'))
+        .map((i) => i.lokasi_ruangan)
+        .filter(Boolean),
+    ]),
+  ]
 
-  // Filter items berdasarkan unit kerja dan ruangan
+  // Filter items berdasarkan unit kerja, ruangan, dan sifat aset
   const filteredItems = items.filter((item) => {
     const matchUnit = selectedUnit === 'Semua Unit Kerja' || item.unit_kerja === selectedUnit
     const matchRoom = !selectedRoom || item.lokasi_ruangan === selectedRoom
+    const matchTipe = filterTipe === 'semua' || (item.sifat_aset || 'terikat_ruangan') === 'terikat_ruangan'
     const matchSearch =
       !search ||
       item.itemName.toLowerCase().includes(search.toLowerCase()) ||
       item.itemCode.toLowerCase().includes(search.toLowerCase()) ||
       (item.merk_tipe && item.merk_tipe.toLowerCase().includes(search.toLowerCase()))
-    return matchUnit && matchRoom && matchSearch
+    return matchUnit && matchRoom && matchTipe && matchSearch
   })
 
   // PJ Ruangan dari barang pertama di ruangan ini
@@ -93,7 +103,7 @@ function KIR() {
       `"${(item.penanggung_jawab || '').replace(/"/g, '""')}"`,
     ])
 
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
+    const csvContent = '\uFEFFsep=;\r\n' + [headers.join(';'), ...rows.map((r) => r.join(';'))].join('\r\n')
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -110,13 +120,8 @@ function KIR() {
 
   return (
     <Layout>
-      {/* BREADCRUMB - HIDDEN IN PRINT */}
+      {/* HEADER - HIDDEN IN PRINT */}
       <div className="print:hidden">
-        <p className="text-xs text-ink/40 mb-2">
-          Aplikasi BMN Itjen <span className="mx-1">›</span>
-          <span className="text-navy font-medium">Kartu Inventaris Ruangan (KIR)</span>
-        </p>
-
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
@@ -190,10 +195,31 @@ function KIR() {
             </div>
           </div>
         </div>
+
+        {/* INFO SCOPE KIR */}
+        <div className="mb-6 p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-blue-900">
+          <div className="flex items-center gap-2">
+            <span className="text-base">🏢</span>
+            <span>
+              <strong>Ketentuan KIR:</strong> Lembar KIR mencatat BMN yang <strong>Terikat Ruangan (Stasioner)</strong> seperti mebel, meja, lemari, &amp; AC. Aset bergerak (laptop/pegawai) dicatat melalui SIPB / daftar pemegang aset.
+            </span>
+          </div>
+          <div className="w-56 shrink-0">
+            <SearchableSelect
+              value={filterTipe}
+              onChange={(val) => setFilterTipe(val)}
+              options={[
+                { value: 'terikat_ruangan', label: '🏢 Khusus Terikat Ruangan' },
+                { value: 'semua', label: 'Semua (Termasuk Mobile)' },
+              ]}
+              placeholder="Cakupan KIR..."
+            />
+          </div>
+        </div>
       </div>
 
       {/* DOCUMENT PREVIEW (PRINT AREA) */}
-      <div className="bg-white p-8 sm:p-12 rounded-2xl border border-black/10 shadow-lg print:border-none print:shadow-none print:p-0">
+      <div className="doc-print-area bg-white p-8 sm:p-12 rounded-2xl border border-black/10 shadow-lg print:border-none print:shadow-none print:p-0">
         {/* KOP RESMI DOKUMEN ITJEN KEMENDAGRI */}
         <div className="flex items-center gap-4 border-b-2 border-black pb-4 mb-6">
           <img src={logoKemendagri} alt="Logo Kemendagri" className="w-20 h-20 object-contain shrink-0" />

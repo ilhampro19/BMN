@@ -14,12 +14,20 @@ class Item extends Model
         'nup',
         'kode_bmn',
         'itemName',
+        'jenis_kendaraan',
         'merk_tipe',
         'nomor_seri',
+        'nomor_polisi',
+        'no_rangka',
+        'no_mesin',
+        'warna',
+        'kelengkapan_standar',
         'tahunPerolehan',
         'nilaiPerolehan',
+        'nilai_buku',
         'kondisi',
         'status_penggunaan',
+        'sifat_aset',
         'lokasi_ruangan',
         'unit_kerja',
         'penanggung_jawab',
@@ -28,6 +36,8 @@ class Item extends Model
     protected $casts = [
         'tahunPerolehan' => 'integer',
         'nilaiPerolehan' => 'float',
+        'nilai_buku' => 'float',
+        'kelengkapan_standar' => 'array',
     ];
 
     public function toArray()

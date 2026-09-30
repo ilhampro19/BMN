@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\KategoriItemController;
 use App\Http\Controllers\MutasiLokasiController;
+use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PeminjamanWasrikController;
 use App\Http\Controllers\PengajuanServisController;
 use App\Http\Controllers\PenyusutanController;
@@ -72,6 +73,14 @@ Route::get('/users/{id}', [UserController::class, 'show']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+// Master Data Pegawai Routes (Admin & Operator)
+Route::get('/pegawai', [PegawaiController::class, 'index']);
+Route::post('/pegawai', [PegawaiController::class, 'store']);
+Route::post('/pegawai/import', [PegawaiController::class, 'importBatch']);
+Route::get('/pegawai/{id}', [PegawaiController::class, 'show']);
+Route::put('/pegawai/{id}', [PegawaiController::class, 'update']);
+Route::delete('/pegawai/{id}', [PegawaiController::class, 'destroy']);
 
 // Pengaturan Profil Mandiri (Self-Service Profile)
 Route::post('/profile/update', [UserController::class, 'updateProfile']);
